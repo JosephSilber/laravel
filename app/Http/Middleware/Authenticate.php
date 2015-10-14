@@ -34,7 +34,7 @@ class Authenticate
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $ability = null)
+    public function handle($request, Closure $next, $ability = null, $model = null)
     {
         if ($this->auth->guest()) {
             if ($request->ajax()) {
@@ -45,9 +45,18 @@ class Authenticate
         }
 
         if (! is_null($ability)) {
-            $this->gate->authorize($ability);
+            $this->authorize($request, $ability, $model);
         }
 
         return $next($request);
+    }
+
+    protected function authorize($request, $ability, $model = null)
+    {
+        if (is_null($model)) {
+            return $this->gate->authorize($ability);
+        }
+
+        $this->gate->authorize($ability, $request->route($model));
     }
 }
