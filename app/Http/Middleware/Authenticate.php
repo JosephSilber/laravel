@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 class Authenticate
 {
@@ -20,9 +21,10 @@ class Authenticate
      * @param  Guard  $auth
      * @return void
      */
-    public function __construct(Guard $auth)
+    public function __construct(Guard $auth, Gate $gate)
     {
         $this->auth = $auth;
+        $this->gate = $gate;
     }
 
     /**
@@ -32,7 +34,7 @@ class Authenticate
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $ability = null)
     {
         if ($this->auth->guest()) {
             if ($request->ajax()) {
@@ -40,6 +42,10 @@ class Authenticate
             } else {
                 return redirect()->guest('auth/login');
             }
+        }
+
+        if (! is_null($ability)) {
+            $this->gate->authorize($ability);
         }
 
         return $next($request);
