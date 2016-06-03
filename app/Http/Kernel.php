@@ -7,6 +7,23 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
+     * I'm not sure about the naming. Basicallym what this does
+     * is assure that if the request uses any of these middleware
+     * they'll be excecuted in this order.
+     *
+     * In short, this is kinda like a dependency graph.
+     *
+     * @var array
+     */
+    protected $middlewarePriority = [
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \App\Http\Middleware\VerifyCsrfToken::class,
+        \Illuminate\Auth\Middleware\Authenticate::class
+        \Illuminate\Routing\Middleware\SubstituteBindings::class,
+    ];
+
+    /**
      * The application's global HTTP middleware stack.
      *
      * These middleware are run during every request to your application.
